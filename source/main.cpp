@@ -5,6 +5,7 @@
 // Includes from PrEWUtils
 #include "Runners/ParallelRunner.h"
 #include "SetupHelp/AccBoxInfo.h"
+#include "SetupHelp/AccBoxPolynomialInfo.h"
 #include "SetupHelp/ConstEffInfo.h"
 #include "SetupHelp/CrossSectionInfo.h"
 #include "SetupHelp/RunInfo.h"
@@ -34,24 +35,26 @@ int main (int /*argc*/, char **/*argv*/) {
   PrEWUtils::Setups::GeneralSetup setup(energy);
 
   spdlog::info("Add files.");
-  setup.add_input_file("/afs/desy.de/group/flc/pool/beyerjac/TGCAnalysis/PrEW/testdata/RK_examplefile_500_250_2018_04_03.root", "RK");
-  setup.add_input_file("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/WW_charge_separated/distributions/combined/Distribution_250GeV_WW_semilep_MuAntiNu.root", "RK");
-  setup.add_input_file("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/WW_charge_separated/distributions/combined/Distribution_250GeV_WW_semilep_AntiMuNu.root", "RK");
-  setup.add_input_file("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/Z_2f_separated/PrEW_inputs/Z2f_separated_cosTheta_distributions.root", "RK");
+  setup.add_input_files("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/NewMCProduction/4f_WW_sl/PrEWInput", ".*\\.csv", "CSV");
+  setup.add_input_files("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/NewMCProduction/4f_sW_sl/PrEWInput", ".*\\.csv", "CSV");
+  setup.add_input_files("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/NewMCProduction/2f_Z_h/PrEWInput", ".*\\.csv", "CSV");
+  setup.add_input_files("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/NewMCProduction/2f_Z_l/PrEWInput", ".*\\.csv", "CSV");
+  
 
   spdlog::info("Selecting distributions.");
-  setup.use_distr("singleWplussemileptonic");
-  setup.use_distr("singleWminussemileptonic");
-  setup.use_distr("WW_semilep_MuAntiNu");
-  setup.use_distr("WW_semilep_AntiMuNu");
-  setup.use_distr("Zuds_81to101");
-  setup.use_distr("Zuds_180to275");
-  setup.use_distr("Zcc_81to101");
-  setup.use_distr("Zcc_180to275");
-  setup.use_distr("Zbb_81to101");
-  setup.use_distr("Zbb_180to275");
-  setup.use_distr("Zmumu_81to101");
-  setup.use_distr("Zmumu_180to275");
+  setup.use_distr("SingleW_eminus");
+  setup.use_distr("SingleW_eplus");
+  setup.use_distr("WW_muminus");
+  setup.use_distr("WW_muplus");
+  setup.use_distr("2f_uds_81to101");
+  setup.use_distr("2f_uds_180to275");
+  setup.use_distr("2f_c_81to101");
+  setup.use_distr("2f_c_180to275");
+  setup.use_distr("2f_b_81to101");
+  setup.use_distr("2f_b_180to275");
+  setup.use_distr("2f_mu_81to101");
+  setup.use_distr("2f_mu_180to275");
+  
   
   spdlog::info("Setting up linking info.");
   
@@ -82,129 +85,130 @@ int main (int /*argc*/, char **/*argv*/) {
   
   
   // Take cTGCs into account in fit
-  spdlog::info("Creating TGC info.");
-  PrEWUtils::SetupHelp::TGCInfo cTGC_info (
-    {"singleWplussemileptonic", "singleWminussemileptonic", "WW_semilep_MuAntiNu", "WW_semilep_AntiMuNu"},
-    "linear"
-  );
-  setup.add(cTGC_info);
+  // spdlog::info("Creating TGC info.");
+  // PrEWUtils::SetupHelp::TGCInfo cTGC_info (
+  //   {"SingleW_eminus", "SingleW_eplus", "WW_muplus", "WW_muminus"},
+  //   "linear"
+  // );
+  // setup.add(cTGC_info);
   
   // Set asymmetries and total chiral cross sections scalings as free parameters
   spdlog::info("Creating chiral cross section infos.");
 
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_singleWminus(
-    "singleWminussemileptonic",
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_SingleW_eplus(
+    "SingleW_eplus",
     {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL, PrEW::GlobalVar::Chiral::eLpL}
   );
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_singleWplus(
-    "singleWplussemileptonic",
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_SingleW_eminus(
+    "SingleW_eminus",
     {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL, PrEW::GlobalVar::Chiral::eRpR}
   );
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_WW_MuAntiNu(
-    "WW_semilep_MuAntiNu",
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_WW_muminus(
+    "WW_muminus",
     {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
   );
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_WW_AntiMuNu(
-    "WW_semilep_AntiMuNu",
-    {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
-  );
-  
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_Zuds_81to101(
-    "Zuds_81to101", 
-    {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
-  );
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_Zcc_81to101(
-    "Zcc_81to101", 
-    {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
-  );
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_Zbb_81to101(
-    "Zbb_81to101", 
-    {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
-  );
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_Zmumu_81to101(
-    "Zmumu_81to101", 
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_WW_muplus(
+    "WW_muplus",
     {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
   );
   
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_Zuds_180to275(
-    "Zuds_180to275", 
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_2f_uds_81to101(
+    "2f_uds_81to101", 
     {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
   );
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_Zcc_180to275(
-    "Zcc_180to275", 
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_2f_c_81to101(
+    "2f_c_81to101", 
     {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
   );
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_Zbb_180to275(
-    "Zbb_180to275", 
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_2f_b_81to101(
+    "2f_b_81to101", 
     {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
   );
-  PrEWUtils::SetupHelp::CrossSectionInfo xs_Zmumu_180to275(
-    "Zmumu_180to275", 
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_2f_mu_81to101(
+    "2f_mu_81to101", 
     {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
   );
   
-  xs_singleWminus.use_chiral_asymmetries();
-  xs_singleWplus.use_chiral_asymmetries();
-  xs_WW_MuAntiNu.use_chiral_asymmetries();
-  xs_WW_AntiMuNu.use_chiral_asymmetries();
-  xs_Zuds_81to101.use_chiral_asymmetries({"Ae_Zpole"});
-  xs_Zcc_81to101.use_chiral_asymmetries({"Ae_Zpole"});
-  xs_Zbb_81to101.use_chiral_asymmetries({"Ae_Zpole"});
-  xs_Zmumu_81to101.use_chiral_asymmetries({"Ae_Zpole"});
-  xs_Zuds_180to275.use_chiral_asymmetries({"Ae_highQ2"});
-  xs_Zcc_180to275.use_chiral_asymmetries({"Ae_highQ2"});
-  xs_Zbb_180to275.use_chiral_asymmetries({"Ae_highQ2"});
-  xs_Zmumu_180to275.use_chiral_asymmetries({"Ae_highQ2"});
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_2f_uds_180to275(
+    "2f_uds_180to275", 
+    {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
+  );
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_2f_c_180to275(
+    "2f_c_180to275", 
+    {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
+  );
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_2f_b_180to275(
+    "2f_b_180to275", 
+    {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
+  );
+  PrEWUtils::SetupHelp::CrossSectionInfo xs_2f_mu_180to275(
+    "2f_mu_180to275", 
+    {PrEW::GlobalVar::Chiral::eLpR, PrEW::GlobalVar::Chiral::eRpL}
+  );
   
-  xs_singleWminus.use_total_chiral_cross_section();
-  xs_singleWplus.use_total_chiral_cross_section();
-  xs_WW_MuAntiNu.use_total_chiral_cross_section();
-  xs_WW_AntiMuNu.use_total_chiral_cross_section();
-  xs_Zuds_81to101.use_total_chiral_cross_section();
-  xs_Zcc_81to101.use_total_chiral_cross_section();
-  xs_Zbb_81to101.use_total_chiral_cross_section();
-  xs_Zmumu_81to101.use_total_chiral_cross_section();
-  xs_Zuds_180to275.use_total_chiral_cross_section();
-  xs_Zcc_180to275.use_total_chiral_cross_section();
-  xs_Zbb_180to275.use_total_chiral_cross_section();
-  xs_Zmumu_180to275.use_total_chiral_cross_section();
+  xs_SingleW_eplus.use_chiral_asymmetries();
+  xs_SingleW_eminus.use_chiral_asymmetries();
+  xs_WW_muminus.use_chiral_asymmetries();
+  xs_WW_muplus.use_chiral_asymmetries();
+  xs_2f_uds_81to101.use_chiral_asymmetries({"Ae_Zpole"});
+  xs_2f_c_81to101.use_chiral_asymmetries({"Ae_Zpole"});
+  xs_2f_b_81to101.use_chiral_asymmetries({"Ae_Zpole"});
+  xs_2f_mu_81to101.use_chiral_asymmetries({"Ae_Zpole"});
+  xs_2f_uds_180to275.use_chiral_asymmetries({"Ae_highQ2"});
+  xs_2f_c_180to275.use_chiral_asymmetries({"Ae_highQ2"});
+  xs_2f_b_180to275.use_chiral_asymmetries({"Ae_highQ2"});
+  xs_2f_mu_180to275.use_chiral_asymmetries({"Ae_highQ2"});
   
-  setup.add(xs_singleWminus);
-  setup.add(xs_singleWplus);
-  setup.add(xs_WW_MuAntiNu);
-  setup.add(xs_WW_AntiMuNu);
-  setup.add(xs_Zuds_81to101);
-  setup.add(xs_Zcc_81to101);
-  setup.add(xs_Zbb_81to101);
-  setup.add(xs_Zmumu_81to101);
-  setup.add(xs_Zuds_180to275);
-  setup.add(xs_Zcc_180to275);
-  setup.add(xs_Zbb_180to275);
-  setup.add(xs_Zmumu_180to275);
+  xs_SingleW_eplus.use_total_chiral_cross_section();
+  xs_SingleW_eminus.use_total_chiral_cross_section();
+  xs_WW_muminus.use_total_chiral_cross_section();
+  xs_WW_muplus.use_total_chiral_cross_section();
+  xs_2f_uds_81to101.use_total_chiral_cross_section();
+  xs_2f_c_81to101.use_total_chiral_cross_section();
+  xs_2f_b_81to101.use_total_chiral_cross_section();
+  xs_2f_mu_81to101.use_total_chiral_cross_section();
+  xs_2f_uds_180to275.use_total_chiral_cross_section();
+  xs_2f_c_180to275.use_total_chiral_cross_section();
+  xs_2f_b_180to275.use_total_chiral_cross_section();
+  xs_2f_mu_180to275.use_total_chiral_cross_section();
+  
+  setup.add(xs_SingleW_eplus);
+  setup.add(xs_SingleW_eminus);
+  setup.add(xs_WW_muminus);
+  setup.add(xs_WW_muplus);
+  setup.add(xs_2f_uds_81to101);
+  setup.add(xs_2f_c_81to101);
+  setup.add(xs_2f_b_81to101);
+  setup.add(xs_2f_mu_81to101);
+  setup.add(xs_2f_uds_180to275);
+  setup.add(xs_2f_c_180to275);
+  setup.add(xs_2f_b_180to275);
+  setup.add(xs_2f_mu_180to275);
   
   
-  spdlog::info("Creating distribution efficiency infos.");
-  PrEWUtils::SetupHelp::ConstEffInfo Zbb_eff ("Zbb_81to101", 0.3);
-  Zbb_eff.constrain(0.3, 0.001);
-  setup.add(Zbb_eff);
+  // spdlog::info("Creating distribution efficiency infos.");
+  // PrEWUtils::SetupHelp::ConstEffInfo 2f_b_eff ("2f_b_81to101", 0.3);
+  // 2f_b_eff.constrain(0.3, 0.001);
+  // setup.add(2f_b_eff);
+
   
-  
-  spdlog::info("Creating acceptance box infos.");
-  PrEWUtils::SetupHelp::AccBoxInfo muon_box("MuonAcceptance", "costheta", 0, 1.9);
-  muon_box.add_distr("Zmumu_81to101");
-  muon_box.add_distr("Zmumu_180to275");
+  spdlog::info("Creating acceptance box (w/ polynomial) infos.");
+  PrEWUtils::SetupHelp::AccBoxPolynomialInfo muon_box("MuonAcc");
+  muon_box.add_distr("WW_muminus");
+  muon_box.add_distr("WW_muplus");
+  muon_box.add_distr("xs_2f_mu_81to101");
+  muon_box.add_distr("xs_2f_mu_180to275");
   setup.add(muon_box);
-  
   
   //7___________________________________________________________________________
   spdlog::info("Setting up changes of the fit wrt. the toys.");
   PrEWUtils::Setups::FitModifier fit_modifier(energy);
   
-  spdlog::info("Use Af parametrisation in fit.");
-  PrEWUtils::SetupHelp::AfInfo Af_Zbb_81to101("Zbb_81to101");
-  PrEWUtils::SetupHelp::AfInfo Af_Zmumu_81to101("Zmumu_81to101");
-  fit_modifier.add(Af_Zbb_81to101);
-  fit_modifier.add(Af_Zmumu_81to101);
+  // spdlog::info("Use Af parametrisation in fit.");
+  // PrEWUtils::SetupHelp::AfInfo Af_2f_b_81to101("2f_b_81to101");
+  // PrEWUtils::SetupHelp::AfInfo Af_2f_mu_81to101("2f_mu_81to101");
+  // fit_modifier.add(Af_2f_b_81to101);
+  // fit_modifier.add(Af_2f_mu_81to101);
   
   
   //7___________________________________________________________________________
