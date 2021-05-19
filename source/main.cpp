@@ -83,11 +83,11 @@ int main(int /*argc*/, char ** /*argv*/) {
   spdlog::info("Use generalised 2f parametrisation in fit.");
   auto pars_2f_mu_81to101 = PrEWUtils::SetupHelp::DifermionPars()
                                 .s0("s0_2f_mu_81to101")
-                                .Ae("Ae_2f_mu_81to101", 0.11)
-                                .Af("Af_2f_mu_81to101", 0.03)
-                                .ef("ef_2f_mu_81to101", 1.4)
-                                .kL("kL_2f_mu_81to101")
-                                .kR("kR_2f_mu_81to101");
+                                .Ae("Ae_2f_mu_81to101", 0.2)
+                                .Af("Af_2f_mu_81to101", 0.2)
+                                .ef("ef_2f_mu_81to101", 0.02)
+                                .kL("kL_2f_mu_81to101", 0.04)
+                                .kR("kR_2f_mu_81to101", 0.04);
   fit_modifier.add(PrEWUtils::SetupHelp::DifermionParamInfo(
       "2f_mu_81to101_FZ", pars_2f_mu_81to101));
   fit_modifier.add(PrEWUtils::SetupHelp::DifermionParamInfo(
