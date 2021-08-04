@@ -34,11 +34,13 @@ int main(int /*argc*/, char ** /*argv*/) {
   PrEWUtils::Setups::GeneralSetup setup(energy);
 
   spdlog::info("Add files.");
-  setup.add_input_files("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/NewMCProduction/4f_WW_sl/PrEWInput", ".*\\.csv", "CSV");
-  setup.add_input_files("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/NewMCProduction/4f_sW_sl/PrEWInput", ".*\\.csv", "CSV");
-  setup.add_input_files("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/NewMCProduction/2f_Z_h/PrEWInput", ".*\\.csv", "CSV");
-  setup.add_input_files("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/NewMCProduction/2f_Z_l/PrEWInput", ".*\\.csv", "CSV");
-  
+  setup.add_input_files("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/"
+                        "SampleProduction/NewMCProduction/4f_WW_sl/PrEWInput",
+                        ".*\\.csv", "CSV");
+  setup.add_input_files(
+      "/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/"
+      "NewMCProduction/2f_Z_l/PrEWInput/MuAcc_costheta_0.9925",
+      ".*\\.csv", "CSV");
 
   spdlog::info("Selecting distributions.");
   setup.use_distr("WW_muminus");
