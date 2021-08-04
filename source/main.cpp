@@ -29,8 +29,7 @@ int main(int /*argc*/, char ** /*argv*/) {
   PrEWUtils::Setups::GeneralSetup setup(energy);
 
   spdlog::info("Add files.");
-  setup.add_input_files("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/NewMCProduction/2f_Z_l/PrEWInput", ".*\\.csv", "CSV");
-  
+  setup.add_input_files("/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/NewMCProduction/2f_Z_l/PrEWInput/MuAcc_costheta_0.9925", ".*\\.csv", "CSV");
 
   spdlog::info("Selecting distributions.");
   setup.use_distr("2f_mu_81to101_FZ");
@@ -86,8 +85,8 @@ int main(int /*argc*/, char ** /*argv*/) {
                                 .Ae("Ae_2f_mu_81to101", 0.2)
                                 .Af("Af_2f_mu_81to101", 0.2)
                                 .ef("ef_2f_mu_81to101", 0.02)
-                                .kL("kL_2f_mu_81to101", 0.04)
-                                .kR("kR_2f_mu_81to101", 0.04);
+                                .k0("k0_2f_mu_81to101", 0.07)
+                                .dk("dk_2f_mu_81to101", 0.0006);
   fit_modifier.add(PrEWUtils::SetupHelp::DifermionParamInfo(
       "2f_mu_81to101_FZ", pars_2f_mu_81to101));
   fit_modifier.add(PrEWUtils::SetupHelp::DifermionParamInfo(
